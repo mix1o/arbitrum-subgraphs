@@ -35,6 +35,15 @@ type Withdrawal @entity {
   l2ToL1Event: L2ToL1Transaction
 }
 
+type Deposit @entity {
+  id: ID!
+  blockNum: BigInt!
+  from: Bytes!
+  to: Bytes!
+  amount: BigInt!
+  exitInfo: TokenGatewayJoinTable!
+}
+
 type L2ToL1Transaction @entity {
   "BigInt! # uint256"
   id: ID!
