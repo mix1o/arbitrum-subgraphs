@@ -30,7 +30,6 @@ const getL2ChainId = (): Bytes => {
     return Bytes.fromByteArray(Bytes.fromHexString("0xa4b1"));
   if (network == "rinkeby")
     return Bytes.fromByteArray(Bytes.fromHexString("0x066EEB"));
-
   log.critical("No chain id recognised", []);
   throw new Error("No chain id found");
 };
@@ -41,12 +40,17 @@ const bitFlip = (input: BigInt): Bytes => {
     "0x8000000000000000000000000000000000000000000000000000000000000000"
   );
 
-  const padding = 32 - input.toHexString().substr(4).length;
-  const paddingContent = "00".repeat(padding);
+  const seqNum = input.toHexString();
+  const bytesRepresentedByZeros = "00".repeat(32);
+  const seqNumWithoutTwoChars = seqNum.substr(2);
+  const padding = bytesRepresentedByZeros.substr(
+    0,
+    bytesRepresentedByZeros.length - seqNumWithoutTwoChars.length
+  );
 
-  const flip = "0x0" + paddingContent + input.toHexString().substr(2);
+  const flip = padding + seqNumWithoutTwoChars;
+
   const bytes = ByteArray.fromHexString(flip);
-
   for (let i: i32 = 0; i < base.byteLength; i++) {
     base[i] = base[i] | bytes[i];
   }
@@ -57,10 +61,13 @@ const bitFlip = (input: BigInt): Bytes => {
 const getL2RetryableTicketId = (inboxSequenceNumber: BigInt): Bytes => {
   const l2ChainId = getL2ChainId();
   const flipped = bitFlip(inboxSequenceNumber);
+
+  // log.info("BIT FLIPPED : {}", [flipped.toHexString()]);
+
   const encoded: ByteArray = encodePadded(l2ChainId, flipped);
 
   const res = Bytes.fromByteArray(crypto.keccak256(encoded));
-
+  log.info("RES:{}", [res.toHexString()]);
   return res;
 };
 
