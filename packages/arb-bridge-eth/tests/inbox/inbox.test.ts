@@ -131,7 +131,7 @@ test("Specific offending retryableID calculation", () => {
   );
 });
 test("Specific offending retryableID calculation", () => {
-  let messageNum = BigInt.fromI32(194894);
+  let messageNum = BigInt.fromI32(1);
   let newInboxEvent1 = createNewMessage("Retryable", messageNum, ethDeposit);
   handleInboxMessageDelivered(newInboxEvent1);
 
@@ -139,7 +139,104 @@ test("Specific offending retryableID calculation", () => {
     RETRYABLE_ENTITY_TYPE,
     messageNum.toHexString(),
     "retryableTicketID",
-    "0xbe7d4b148f7c29a4d6322a02f6d087051c5e67b6780f868e99793821e8de71d6"
+    "0x1f18cd93c236e7147ffce02c69afd1ebd3b7431681934af2bdc6b5e50f2abc0f"
+  );
+});
+test("Specific offending retryableID calculation", () => {
+  let messageNum = BigInt.fromI32(12);
+  let newInboxEvent1 = createNewMessage("Retryable", messageNum, ethDeposit);
+  handleInboxMessageDelivered(newInboxEvent1);
+
+  assert.fieldEquals(
+    RETRYABLE_ENTITY_TYPE,
+    messageNum.toHexString(),
+    "retryableTicketID",
+    "0xe47d2a57ca7c2f5bca5316e21018f0bc516109b7c303aca2d4202635b9e89755"
+  );
+});
+
+test("Specific offending retryableID calculation", () => {
+  let messageNum = BigInt.fromI32(123);
+  let newInboxEvent1 = createNewMessage("Retryable", messageNum, ethDeposit);
+  handleInboxMessageDelivered(newInboxEvent1);
+
+  assert.fieldEquals(
+    RETRYABLE_ENTITY_TYPE,
+    messageNum.toHexString(),
+    "retryableTicketID",
+    "0xe9b80d393204fc92504ea3f0b313d962df60c95f81d3005b99f9c6b26201facb"
+  );
+});
+test("Specific offending retryableID calculation", () => {
+  let messageNum = BigInt.fromI32(1234);
+  let newInboxEvent1 = createNewMessage("Retryable", messageNum, ethDeposit);
+  handleInboxMessageDelivered(newInboxEvent1);
+
+  assert.fieldEquals(
+    RETRYABLE_ENTITY_TYPE,
+    messageNum.toHexString(),
+    "retryableTicketID",
+    "0xeecea4a0147ef9f6391a44acee7ec343b6c24ee614b87f025654d3f7c3c9e607"
+  );
+});
+test("Specific offending retryableID calculation", () => {
+  let messageNum = BigInt.fromI32(12345);
+  let newInboxEvent1 = createNewMessage("Retryable", messageNum, ethDeposit);
+  handleInboxMessageDelivered(newInboxEvent1);
+
+  assert.fieldEquals(
+    RETRYABLE_ENTITY_TYPE,
+    messageNum.toHexString(),
+    "retryableTicketID",
+    "0x0e602e40c30a331885681919849381cdc614d373263e072d4e0c16749335abcf"
+  );
+});
+test("Specific offending retryableID calculation", () => {
+  let messageNum = BigInt.fromI32(123456);
+  let newInboxEvent1 = createNewMessage("Retryable", messageNum, ethDeposit);
+  handleInboxMessageDelivered(newInboxEvent1);
+
+  assert.fieldEquals(
+    RETRYABLE_ENTITY_TYPE,
+    messageNum.toHexString(),
+    "retryableTicketID",
+    "0x7e871aa17b1a37f25b2c0d475445935c82c2ea145d07759901671e261fd3d0b8"
+  );
+});
+test("Specific offending retryableID calculation", () => {
+  let messageNum = BigInt.fromI32(1234567);
+  let newInboxEvent1 = createNewMessage("Retryable", messageNum, ethDeposit);
+  handleInboxMessageDelivered(newInboxEvent1);
+
+  assert.fieldEquals(
+    RETRYABLE_ENTITY_TYPE,
+    messageNum.toHexString(),
+    "retryableTicketID",
+    "0xea7d4913f3597bd20ad2b03af233b14c4c96add6a2daa00a623457727dd7e4da"
+  );
+});
+test("Specific offending retryableID calculation", () => {
+  let messageNum = BigInt.fromI32(12345678);
+  let newInboxEvent1 = createNewMessage("Retryable", messageNum, ethDeposit);
+  handleInboxMessageDelivered(newInboxEvent1);
+
+  assert.fieldEquals(
+    RETRYABLE_ENTITY_TYPE,
+    messageNum.toHexString(),
+    "retryableTicketID",
+    "0xe5075798a661434ec851a6d71e9ff254bcb42d1d766529412ee6e566c0a49790"
+  );
+});
+test("Specific offending retryableID calculation", () => {
+  let messageNum = BigInt.fromI32(123456789);
+  let newInboxEvent1 = createNewMessage("Retryable", messageNum, ethDeposit);
+  handleInboxMessageDelivered(newInboxEvent1);
+
+  assert.fieldEquals(
+    RETRYABLE_ENTITY_TYPE,
+    messageNum.toHexString(),
+    "retryableTicketID",
+    "0xa6a922df5c9cbf5b58f34cd9c44f60addca43ddc67a5929901cdf59997cf358c"
   );
 });
 
