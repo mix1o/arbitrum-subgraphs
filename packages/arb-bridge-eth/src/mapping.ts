@@ -19,12 +19,13 @@ import {
   dataSource,
   crypto,
   store,
-  ByteArray
+  ByteArray,
 } from "@graphprotocol/graph-ts";
 import { encodePadded, padBytes } from "subgraph-common";
 
 const getL2ChainId = (): Bytes => {
   const network = dataSource.network();
+
   if (network == "mainnet")
     return Bytes.fromByteArray(Bytes.fromHexString("0xa4b1"));
   if (network == "rinkeby")
@@ -39,7 +40,12 @@ const bitFlip = (input: BigInt): Bytes => {
   const base = Bytes.fromHexString(
     "0x8000000000000000000000000000000000000000000000000000000000000000"
   );
-  const bytes = padBytes(Bytes.fromBigInt(input), 32);
+
+  const padding = 32 - input.toHexString().substr(4).length;
+  const paddingContent = "00".repeat(padding);
+
+  const flip = "0x0" + paddingContent + input.toHexString().substr(2);
+  const bytes = ByteArray.fromHexString(flip);
 
   for (let i: i32 = 0; i < base.byteLength; i++) {
     base[i] = base[i] | bytes[i];
@@ -49,22 +55,11 @@ const bitFlip = (input: BigInt): Bytes => {
 };
 
 const getL2RetryableTicketId = (inboxSequenceNumber: BigInt): Bytes => {
-  // keccak256(zeroPad(l2ChainId), zeroPad(bitFlipedinboxSequenceNumber))
   const l2ChainId = getL2ChainId();
   const flipped = bitFlip(inboxSequenceNumber);
   const encoded: ByteArray = encodePadded(l2ChainId, flipped);
-  const res = Bytes.fromByteArray(crypto.keccak256(encoded));
 
-  // log.info(
-  //   "Getting Retryable ticket Id. l2Chain id {} . inboxSeq {} . flipped {} . encoded {} . retTicketId {}",
-  //   [
-  //     l2ChainId.toHexString(),
-  //     inboxSequenceNumber.toHexString(),
-  //     flipped.toHexString(),
-  //     encoded.toHexString(),
-  //     res.toHexString(),
-  //   ]
-  // );
+  const res = Bytes.fromByteArray(crypto.keccak256(encoded));
 
   return res;
 };
@@ -128,8 +123,8 @@ class RetryableTx {
       const dataLength = parsedArray[8].toBigInt().toI32();
       const l2Calldata = new Bytes(dataLength);
 
-      for(let i = 0; i < dataLength; i++) {
-        l2Calldata[dataLength-i-1] = data[data.length - i - 1]
+      for (let i = 0; i < dataLength; i++) {
+        l2Calldata[dataLength - i - 1] = data[data.length - i - 1];
       }
 
       return new RetryableTx(
@@ -163,12 +158,14 @@ export function handleInboxMessageDelivered(
     throw new Error("Oh damn no entity wrong order");
   }
   if (prevEntity.kind != "Retryable") {
-    log.info("Prev entity not a retryable, skipping. messageNum: {}", [event.params.messageNum.toHexString()])
+    log.info("Prev entity not a retryable, skipping. messageNum: {}", [
+      event.params.messageNum.toHexString(),
+    ]);
     return;
   }
-  log.info("Processing retryable before", [])
+
   const retryable = RetryableTx.parseRetryable(event.params.data);
-  log.info("Processing retryable after", [])
+
   if (retryable) {
     let entity = new Retryable(id);
     entity.value = event.transaction.value;
