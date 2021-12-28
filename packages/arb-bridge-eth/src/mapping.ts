@@ -9,6 +9,7 @@ import {
   OutboxOutput,
   Retryable,
   RawMessage,
+  IncomingTransfer,
 } from "../generated/schema";
 import {
   Bytes,
@@ -61,8 +62,6 @@ const bitFlip = (input: BigInt): Bytes => {
 const getL2RetryableTicketId = (inboxSequenceNumber: BigInt): Bytes => {
   const l2ChainId = getL2ChainId();
   const flipped = bitFlip(inboxSequenceNumber);
-
-  // log.info("BIT FLIPPED : {}", [flipped.toHexString()]);
 
   const encoded: ByteArray = encodePadded(l2ChainId, flipped);
 
@@ -180,7 +179,27 @@ export function handleInboxMessageDelivered(
     entity.retryableTicketID = getL2RetryableTicketId(event.params.messageNum);
     entity.destAddr = retryable.destAddress;
     entity.l2Calldata = retryable.data;
+
     entity.save();
+    if (entity.l2Calldata.toHexString().slice(0, 10) == "0x2e567b36") {
+      // Function: finalizeInboundTransfer(address l1Token, address from, address to, uint256 amount, bytes) ***
+      let callDataDecoded = ethereum.decode(
+        "(address,address,address,uint256)",
+        entity.l2Calldata
+      );
+      if (callDataDecoded) {
+        const parsedArrayCallData = callDataDecoded.toTuple();
+
+        let incomingTransfer = new IncomingTransfer(id);
+        incomingTransfer.l1Token = parsedArrayCallData[0].toAddress();
+        incomingTransfer.from = parsedArrayCallData[1].toAddress();
+        incomingTransfer.to = parsedArrayCallData[2].toAddress();
+        incomingTransfer.amount = parsedArrayCallData[3].toBigInt();
+        incomingTransfer.retryableTicket = entity.id;
+
+        incomingTransfer.save();
+      }
+    }
     // we delete the old raw message since now we saved the retryable
     store.remove("RawMessage", id);
   } else {
