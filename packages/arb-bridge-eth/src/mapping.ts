@@ -26,11 +26,12 @@ import { encodePadded, padBytes } from "subgraph-common";
 
 const getL2ChainId = (): Bytes => {
   const network = dataSource.network();
-  return Bytes.fromByteArray(Bytes.fromHexString("0x066EEB"));
 
   if (network == "mainnet")
     return Bytes.fromByteArray(Bytes.fromHexString("0xa4b1"));
-  if (network == "rinkeby") log.critical("No chain id recognised", []);
+  if (network == "rinkeby")
+    return Bytes.fromByteArray(Bytes.fromHexString("0x066EEB"));
+  log.critical("No chain id recognised", []);
   throw new Error("No chain id found");
 };
 
