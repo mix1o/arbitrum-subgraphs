@@ -44,3 +44,12 @@ type Retryable @entity {
   "calldata used in L2 call"
   l2Calldata: Bytes!
 }
+
+type IncomingTransfer @entity {
+  id: ID!
+  l1Token: Bytes!
+  from: Bytes!
+  to: Bytes!
+  amount: BigInt!
+  retryableTicket: Retryable!
+}
