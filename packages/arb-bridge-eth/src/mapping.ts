@@ -183,9 +183,10 @@ export function handleInboxMessageDelivered(
     entity.save();
     if (entity.l2Calldata.toHexString().slice(0, 10) == "0x2e567b36") {
       // Function: finalizeInboundTransfer(address l1Token, address from, address to, uint256 amount, bytes) ***
+      let parameterData = Bytes.fromUint8Array(entity.l2Calldata.slice(4));
       let callDataDecoded = ethereum.decode(
         "(address,address,address,uint256)",
-        Bytes.fromUint8Array(entity.l2Calldata.slice(8))
+        parameterData
       );
 
       if (callDataDecoded) {
