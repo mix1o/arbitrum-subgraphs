@@ -179,6 +179,7 @@ export function handleInboxMessageDelivered(
     entity.retryableTicketID = getL2RetryableTicketId(event.params.messageNum);
     entity.destAddr = retryable.destAddress;
     entity.l2Calldata = retryable.data;
+    entity.timestamp = event.block.timestamp;
 
     entity.save();
     if (entity.l2Calldata.toHexString().slice(0, 10) == "0x2e567b36") {
