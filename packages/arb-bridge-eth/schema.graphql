@@ -44,6 +44,7 @@ type Retryable @entity {
   "calldata used in L2 call"
   l2Calldata: Bytes!
   timestamp: BigInt!
+  l1TxHash: Bytes!
 }
 
 type IncomingTransfer @entity {

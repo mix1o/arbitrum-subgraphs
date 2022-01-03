@@ -180,6 +180,7 @@ export function handleInboxMessageDelivered(
     entity.destAddr = retryable.destAddress;
     entity.l2Calldata = retryable.data;
     entity.timestamp = event.block.timestamp;
+    entity.l1TxHash = event.transaction.hash;
 
     entity.save();
     if (entity.l2Calldata.toHexString().slice(0, 10) == "0x2e567b36") {
