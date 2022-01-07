@@ -49,7 +49,4 @@ dataSources:
           handler: handleRedeemed
         - event: TicketCreated(indexed bytes32)
           handler: handleTicketCreated
-      callHandlers:
-        - function: createRetryableTicket(address,uint256,uint256,address,address,uint256,uint256,bytes)
-          handler: handleCreateRetryableTicketWithStatusFailed
       file: ./src/mapping.ts
