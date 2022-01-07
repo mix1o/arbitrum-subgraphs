@@ -9,7 +9,7 @@
     "prepare:mainnet": "yarn workspace subgraph-common mustache $(pwd)/../subgraph-common/config/mainnet.json $(pwd)/subgraph.template.yaml | tail -n +2 > subgraph.yaml",
     "prepare:rinkeby": "yarn workspace subgraph-common mustache $(pwd)/../subgraph-common/config/rinkeby.json $(pwd)/subgraph.template.yaml | tail -n +2 > subgraph.yaml",
     "deploy:mainnet": "yarn prepare:mainnet && graph deploy --node https://api.thegraph.com/deploy/ fredlacs/arb-builtins",
-    "deploy:rinkeby": "yarn prepare:rinkeby && graph deploy --node https://api.thegraph.com/deploy/ fredlacs/arb-builtins-rinkeby"
+    "deploy:rinkeby": "yarn prepare:rinkeby && graph deploy --product hosted-service mix1o/l2-subgraph-arbitrum-rinkeby"
   },
   "dependencies": {
     "subgraph-common": "0.0.1",
