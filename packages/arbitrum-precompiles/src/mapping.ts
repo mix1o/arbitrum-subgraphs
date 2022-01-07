@@ -1,12 +1,13 @@
 import { L2ToL1Transaction as L2ToL1TransactionEvent } from "../generated/ArbSys/ArbSys";
-import { L2ToL1Transaction, Retryable } from "../generated/schema";
+import { L2ToL1Transaction, Retryable, Withdraw } from "../generated/schema";
 import {
   Canceled as CanceledEvent,
   LifetimeExtended as LifetimeExtendedEvent,
   Redeemed as RedeemedEvent,
   TicketCreated as TicketCreatedEvent,
+  CreateRetryableTicketCall,
 } from "../generated/ArbRetryableTx/ArbRetryableTx";
-import { log } from "@graphprotocol/graph-ts";
+import { Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { RETRYABLE_LIFETIME_SECONDS } from "subgraph-common/src/helpers";
 
 export function handleL2ToL1Transaction(event: L2ToL1TransactionEvent): void {
@@ -24,6 +25,28 @@ export function handleL2ToL1Transaction(event: L2ToL1TransactionEvent): void {
   entity.timestamp = event.params.timestamp;
   entity.callvalue = event.params.callvalue;
   entity.data = event.params.data;
+
+  if (entity.data.toHexString().slice(0, 10) == "0x2e567b36") {
+    // Function: finalizeInboundTransfer(address l1Token, address from, address to, uint256 amount, bytes) ***
+    let parameterData = Bytes.fromUint8Array(entity.data.slice(4));
+    let callDataDecoded = ethereum.decode(
+      "(address,address,address,uint256)",
+      parameterData
+    );
+
+    if (callDataDecoded) {
+      const parsedArrayCallData = callDataDecoded.toTuple();
+
+      let withdraw = new Withdraw(entity.id);
+      withdraw.l1Token = parsedArrayCallData[0].toAddress();
+      withdraw.from = parsedArrayCallData[1].toAddress();
+      withdraw.to = parsedArrayCallData[2].toAddress();
+      withdraw.amount = parsedArrayCallData[3].toBigInt();
+      withdraw.l2Tol1Txn = entity.id;
+
+      withdraw.save();
+    }
+  }
 
   // TODO: query for L2 to L1 tx proof
   // TODO: don't make this an archive query
@@ -57,19 +80,19 @@ export function handleLifetimeExtended(event: LifetimeExtendedEvent): void {
 
 export function handleRedeemed(event: RedeemedEvent): void {
   let entity = Retryable.load(event.params.userTxHash.toHexString());
+  Retryable.load;
   if (!entity) {
     log.critical("Missed a retryable ticket somewhere!", []);
     throw new Error("No retryable ticket");
   }
   // TODO: we can compare hash(retryableTicketID, 1) to redeemTxId to infer if this was an auto redeem or not
-  entity.redeemTxId = event.transaction.hash
+  entity.redeemTxId = event.transaction.hash;
   entity.status = "Redeemed";
   entity.save();
 }
 
 export function handleTicketCreated(event: TicketCreatedEvent): void {
   let entity = new Retryable(event.params.userTxHash.toHexString());
-
   // could query the precompile at `getLifetime()` but we don't need the expensive archive query
   entity.timeoutTimestamp = event.block.timestamp.plus(
     RETRYABLE_LIFETIME_SECONDS

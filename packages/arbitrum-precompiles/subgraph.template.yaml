@@ -5,7 +5,7 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: ArbSys
-    network: {{ l2Network }}
+    network: {{l2Network}}
     source:
       address: "0x0000000000000000000000000000000000000064"
       abi: ArbSys
@@ -24,7 +24,7 @@ dataSources:
       file: ./src/mapping.ts
   - kind: ethereum/contract
     name: ArbRetryableTx
-    network: {{ l2Network }}
+    network: {{l2Network}}
     source:
       address: "0x000000000000000000000000000000000000006E"
       abi: ArbRetryableTx
@@ -49,4 +49,7 @@ dataSources:
           handler: handleRedeemed
         - event: TicketCreated(indexed bytes32)
           handler: handleTicketCreated
+      callHandlers:
+        - function: createRetryableTicket(address,uint256,uint256,address,address,uint256,uint256,bytes)
+          handler: handleCreateRetryableTicketWithStatusFailed
       file: ./src/mapping.ts
